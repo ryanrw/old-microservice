@@ -8,13 +8,19 @@ export async function getExecuableSchema(link: string) {
   const graphqlLink = new HttpLink({ uri: link, fetch });
   const linkWithHeader = setContext(
     (_request: GraphQLRequest, previousContext) => {
-      console.log(previousContext);
-      return {
-        headers: {
-          Authorization:
-            previousContext.graphqlContext.headers.authorization || null
-        }
-      };
+      if (
+        !(
+          Object.keys(previousContext).length === 0 &&
+          previousContext.constructor === Object
+        )
+      ) {
+        return {
+          headers: {
+            Authorization:
+              previousContext.graphqlContext.headers.authorization || null
+          }
+        };
+      }
     }
   ).concat(graphqlLink);
   const schema = await introspectSchema(linkWithHeader);

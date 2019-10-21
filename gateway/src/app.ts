@@ -1,9 +1,5 @@
 import { mergeSchemas } from "graphql-tools";
-import { graphqlExpress } from "apollo-server-express/dist/expressApollo";
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
-
+import { ApolloServer } from "apollo-server";
 import { getExecuableSchema } from "./getSchema";
 
 export async function start() {
@@ -14,18 +10,15 @@ export async function start() {
     schemas: [usersAPI, postsAPI]
   });
 
-  const app = express();
+  const server = new ApolloServer({
+    schema,
+    context: ({ req }) => {
+      return req;
+    }
+  });
 
-  app.use(
-    "/graphql",
-    cors(),
-    bodyParser.json(),
-    graphqlExpress(async request => ({
-      schema,
-      context: { headers: request.headers || null }
-    }))
-  );
-  app.listen({ port: 4000 }, () =>
-    console.log(`🚀 Server ready at http://localhost:4000/graphql`)
-  );
+  // The `listen` method launches a web server.
+  server.listen().then(({ url }) => {
+    console.log(`🚀  Server ready at ${url}`);
+  });
 }
