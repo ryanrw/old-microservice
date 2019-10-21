@@ -1,0 +1,12 @@
+version: "2"
+
+services:
+  database:
+    image: postgres:12-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
